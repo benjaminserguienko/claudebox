@@ -244,8 +244,11 @@ get_profile_openwrt() {
 }
 
 get_profile_rust() {
+    # rustup installs into $HOME/.cargo, so run it as the runtime user
     cat << 'EOF'
+USER claude
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+USER root
 ENV PATH="/home/claude/.cargo/bin:$PATH"
 EOF
 }
