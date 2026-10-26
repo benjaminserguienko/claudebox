@@ -15,6 +15,8 @@ mkdir -p "$HOME"
 
 # shellcheck disable=SC1091
 source "$ROOT_DIR/lib/token.sh"
+# shellcheck disable=SC1091
+source "$ROOT_DIR/lib/commands.token.sh"
 
 TESTS_RUN=0
 TESTS_PASSED=0
@@ -98,6 +100,15 @@ host_variable_authenticates_every_slot() {
 
 check "a saved shared token authenticates a slot without its own login" saved_token_authenticates_every_slot
 check "a host token authenticates a slot without its own login" host_variable_authenticates_every_slot
+
+status_without_token_says_not_set() {
+    local output
+    reset_token_state
+    output=$(_cmd_token status 2>&1) || return 1
+    printf '%s' "$output" | grep -q 'not set'
+}
+
+check "token status reports when no token is set" status_without_token_says_not_set
 
 printf '\n%d/%d tests passed\n' "$TESTS_PASSED" "$TESTS_RUN"
 [ "$TESTS_PASSED" -eq "$TESTS_RUN" ]
