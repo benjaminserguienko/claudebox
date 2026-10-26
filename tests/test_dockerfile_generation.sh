@@ -55,6 +55,10 @@ if [[ "$rustup_user" != "claude" ]]; then
     exit 1
 fi
 grep -q 'ENV PATH="/home/claude/.cargo/bin:' "$TEST_ROOT/generated.Dockerfile"
+if ! grep 'sh\.rustup\.rs' "$TEST_ROOT/generated.Dockerfile" | grep -q -- '--component rust-analyzer'; then
+    printf 'FAIL: rust profile does not install the rust-analyzer component\n' >&2
+    exit 1
+fi
 [[ -z $(find "$TEST_ROOT/tmp" -type f -print) ]]
 status=0
 env HOME="$TEST_ROOT/home" TMPDIR="$TEST_ROOT/tmp" TEST_ROOT="$TEST_ROOT" TEST_FAIL=true \
