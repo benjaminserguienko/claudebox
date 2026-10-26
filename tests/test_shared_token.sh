@@ -55,5 +55,13 @@ saved_token_is_owner_only() {
 
 check "saved token file is readable only by its owner" saved_token_is_owner_only
 
+host_variable_wins_over_saved_token() {
+    reset_token_state
+    save_shared_token "sk-ant-oat01-saved" || return 1
+    [ "$(CLAUDE_CODE_OAUTH_TOKEN="sk-ant-oat01-host" read_shared_token)" = "sk-ant-oat01-host" ]
+}
+
+check "host CLAUDE_CODE_OAUTH_TOKEN wins over the saved token" host_variable_wins_over_saved_token
+
 printf '\n%d/%d tests passed\n' "$TESTS_PASSED" "$TESTS_RUN"
 [ "$TESTS_PASSED" -eq "$TESTS_RUN" ]

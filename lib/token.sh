@@ -24,9 +24,13 @@ save_shared_token() {
     chmod 600 "$file"
 }
 
-# Print the token to use
+# Print the token to use: the host variable if set, otherwise the saved file
 read_shared_token() {
     local file
+    if [[ -n "${CLAUDE_CODE_OAUTH_TOKEN:-}" ]]; then
+        printf '%s\n' "$CLAUDE_CODE_OAUTH_TOKEN"
+        return 0
+    fi
     file=$(shared_token_file)
     if [[ -f "$file" ]]; then
         cat "$file"
