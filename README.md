@@ -162,6 +162,26 @@ session. Bare `claudebox` continues to select an inactive slot.
 its saved authentication and history; it refuses to remove an active slot. `claudebox revoke all` removes inactive slots while
 skipping active ones. Neither command deletes the project workspace.
 
+### Log In Once for All Slots
+
+By default you log in separately in every slot of every project. With a Claude
+subscription you can log in once instead:
+
+```bash
+cd ~/projects/my-project    # Any project you have already launched once
+claudebox token set         # Runs `claude setup-token`; paste the token it prints
+claudebox token status      # Shows whether a token is set (never prints it)
+claudebox token remove      # Deletes the saved token
+```
+
+`claudebox token set` opens the usual browser login in a temporary container, then
+asks you to paste the long-lived token Claude prints (the input is hidden). It is saved
+to `~/.claudebox/oauth-token`, readable only by you, and every slot of every project
+uses it from then on. If `CLAUDE_CODE_OAUTH_TOKEN` is set in your environment, it is
+used instead of the saved file. The token lasts about a year; run `claudebox token set`
+again when it expires. Slots that you already logged in to keep their saved login,
+which applies again after `claudebox token remove`.
+
 See [Installation, persistence and customization](docs/operations.md) for installer
 internals, actual storage paths, host access to session logs, and persistent tools.
 

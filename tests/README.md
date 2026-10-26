@@ -45,7 +45,10 @@ cd tests
 
 ### test_shared_token.sh
 Covers the shared OAuth token (one `claude setup-token` login used by every
-slot): saving and reading the token. Uses a temporary HOME; no Docker needed.
+slot): saving it privately, the host `CLAUDE_CODE_OAUTH_TOKEN` taking precedence,
+slots counting as logged in, and `claudebox token set|status|remove`. Uses a
+temporary HOME and a stubbed container launcher; no Docker needed. How the token
+reaches containers is covered in `test_runtime_regressions.sh`.
 
 **Usage:**
 ```bash
