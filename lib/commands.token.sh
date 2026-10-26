@@ -50,6 +50,10 @@ _token_set() {
     printf '\n' >&2
     # Tokens contain no whitespace; drop any picked up while copying.
     token=$(printf '%s' "$token" | tr -d '[:space:]')
+    if [[ -z "$token" ]]; then
+        printf '%s\n' "ERROR: No token pasted; nothing saved." >&2
+        return 1
+    fi
     save_shared_token "$token"
 }
 

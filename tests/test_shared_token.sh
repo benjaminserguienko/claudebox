@@ -169,5 +169,17 @@ set_saves_pasted_token_from_setup_token() {
 
 check "token set runs setup-token in a temporary slot and saves the pasted token" set_saves_pasted_token_from_setup_token
 
+set_rejects_empty_paste_and_keeps_old_token() {
+    reset_token_state
+    mkdir -p "$PROJECT_PARENT_DIR"
+    save_shared_token "sk-ant-oat01-old" || return 1
+    if printf '   \n' | _cmd_token set >/dev/null 2>&1; then
+        return 1
+    fi
+    [ "$(read_shared_token)" = "sk-ant-oat01-old" ]
+}
+
+check "token set rejects an empty paste and keeps the saved token" set_rejects_empty_paste_and_keeps_old_token
+
 printf '\n%d/%d tests passed\n' "$TESTS_PASSED" "$TESTS_RUN"
 [ "$TESTS_PASSED" -eq "$TESTS_RUN" ]
