@@ -247,7 +247,7 @@ get_profile_rust() {
     # rustup installs into $HOME/.cargo, so run it as the runtime user
     cat << 'EOF'
 USER claude
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --component rust-analyzer
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o /tmp/rustup-init.sh && sh /tmp/rustup-init.sh -y --component rust-analyzer && rm /tmp/rustup-init.sh
 USER root
 ENV PATH="/home/claude/.cargo/bin:$PATH"
 EOF
