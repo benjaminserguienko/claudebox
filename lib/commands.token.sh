@@ -29,7 +29,7 @@ _token_status() {
     file=$(shared_token_file)
     if [[ -n "${CLAUDE_CODE_OAUTH_TOKEN:-}" ]]; then
         printf '%s\n' "Shared token: set from CLAUDE_CODE_OAUTH_TOKEN"
-    elif [[ -s "$file" ]]; then
+    elif shared_token_configured; then
         printf 'Shared token: saved in %s\n' "$file"
     else
         printf '%s\n' "Shared token: not set"
