@@ -140,7 +140,7 @@ _cmd_tmux() {
                 
                 if [[ -d "$slot_dir" ]]; then
                     ((available_count++)) || true
-                    if [[ -f "$slot_dir/.claude/.credentials.json" ]]; then
+                    if slot_is_authenticated "$slot_dir"; then
                         ((authenticated_count++)) || true
                     fi
                 fi
@@ -529,7 +529,7 @@ Current directory: $PWD"
                         local slot_dir="$PROJECT_PARENT_DIR/$slot_name"
                         
                         # Check if this slot is authenticated
-                        if [[ -f "$slot_dir/.claude/.credentials.json" ]]; then
+                        if slot_is_authenticated "$slot_dir"; then
                             if [[ "$VERBOSE" == "true" ]]; then
                                 echo "[DEBUG] Sending activate command to authenticated slot $slot_num (pane $pane_id)" >&2
                             fi
@@ -642,7 +642,7 @@ Current directory: $PWD"
                         local slot_dir="$PROJECT_PARENT_DIR/$slot_name"
                         
                         # Check if this slot is authenticated
-                        if [[ -f "$slot_dir/.claude/.credentials.json" ]]; then
+                        if slot_is_authenticated "$slot_dir"; then
                             if [[ "$VERBOSE" == "true" ]]; then
                                 echo "[DEBUG] Sending activate command to authenticated slot $slot_num (pane $pane_id)" >&2
                             fi

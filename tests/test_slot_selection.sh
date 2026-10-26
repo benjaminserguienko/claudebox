@@ -71,6 +71,8 @@ docker() {
 }
 
 # shellcheck disable=SC1091
+source "$ROOT_DIR/lib/token.sh"
+# shellcheck disable=SC1091
 source "$ROOT_DIR/lib/project.sh"
 # shellcheck disable=SC1091
 source "$ROOT_DIR/lib/preflight.sh"

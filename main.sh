@@ -44,7 +44,7 @@ export VERBOSE=false
 LIB_DIR="${SCRIPT_DIR}/lib"
 
 # Load libraries in order - cli.sh must be loaded first for parsing
-for lib in cli common env os state project clipboard docker config commands welcome preflight; do
+for lib in cli common env os state token project clipboard docker config commands welcome preflight; do
     # shellcheck disable=SC1090
     source "${LIB_DIR}/${lib}.sh"
 done

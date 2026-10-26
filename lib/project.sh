@@ -210,7 +210,9 @@ find_ready_slot() {
         [ -d "$dir" ] || continue
         
         # Check if authenticated
-        [ -f "$dir/.claude/.credentials.json" ] || continue
+        if ! slot_is_authenticated "$dir"; then
+            continue
+        fi
         
         # Check if not running (inactive)
         if ! docker ps --format "{{.Names}}" | grep -q "^claudebox-.*-${name}$"; then
@@ -438,7 +440,7 @@ list_project_slots() {
         
         if [ -d "$dir" ]; then
             # Check authentication status
-            if [ -f "$dir/.claude/.credentials.json" ]; then
+            if slot_is_authenticated "$dir"; then
                 auth_icon="✔️"
                 auth_text="Authenticated"
             else

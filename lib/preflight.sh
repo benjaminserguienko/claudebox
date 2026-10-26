@@ -50,7 +50,7 @@ preflight_check() {
                 parent_dir=$(get_parent_dir "$PROJECT_DIR" 2>/dev/null || echo "")
                 if [[ -n "$parent_dir" ]] && [[ -d "$parent_dir" ]]; then
                     for slot_dir in "$parent_dir"/*/ ; do
-                        if [[ -d "$slot_dir" ]] && [[ -f "$slot_dir/.claude/.credentials.json" ]]; then
+                        if [[ -d "$slot_dir" ]] && slot_is_authenticated "$slot_dir"; then
                             has_slot=true
                             break
                         fi
@@ -124,7 +124,7 @@ Please cd to a project directory first."
             parent_dir=$(get_parent_dir "$PROJECT_DIR" 2>/dev/null || echo "")
             if [[ -n "$parent_dir" ]] && [[ -d "$parent_dir" ]]; then
                 for slot_dir in "$parent_dir"/*/ ; do
-                    if [[ -d "$slot_dir" ]] && [[ -f "$slot_dir/.claude/.credentials.json" ]]; then
+                    if [[ -d "$slot_dir" ]] && slot_is_authenticated "$slot_dir"; then
                         has_slot=true
                         break
                     fi
