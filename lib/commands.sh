@@ -35,6 +35,15 @@ source "${LIB_DIR}/commands.profile.sh"
 source "${LIB_DIR}/commands.slot.sh"
 
 # ============================================================================
+# TOKEN COMMANDS - Shared login for all slots
+# ============================================================================
+# Commands: token set, token status, token remove
+# - set: Runs `claude setup-token` and saves the token for every project
+# - status: Shows whether a shared token is set and where it comes from
+# - remove: Deletes the saved token
+source "${LIB_DIR}/commands.token.sh"
+
+# ============================================================================
 # INFO COMMANDS - Information display
 # ============================================================================
 # Commands: info, projects, allowlist
@@ -121,6 +130,7 @@ show_help() {
   create                          Create new authenticated container slot
   slots                           List all container slots
   slot <number>                   Launch a specific container slot
+  token set|status|remove         Log in once for all slots and projects
   project <name>                  Open project by name/hash from anywhere
   tmux                            Launch ClaudeBox with tmux support enabled"
     
@@ -233,6 +243,7 @@ show_full_help() {
   create                          Create new authenticated container slot\
   slots                           List all container slots\
   slot <number>                   Launch a specific container slot\
+  token set|status|remove         Log in once for all slots and projects\
   project <name>                  Open project by name/hash from anywhere\
   tmux                            Launch ClaudeBox with tmux support enabled')
         
@@ -281,6 +292,7 @@ dispatch_command() {
         slot)             _cmd_slot "$@" ;;
         revoke)           _cmd_revoke "$@" ;;
         kill)             _cmd_kill "$@" ;;
+        token)            _cmd_token "$@" ;;
         
         # Info commands
         projects)         _cmd_projects "$@" ;;

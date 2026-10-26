@@ -117,6 +117,38 @@ check_profile_file "python listed after add" grep '^python$'
 run_case "remove python"       yes remove python
 check_profile_file "python gone after remove" not_grep '^python$'
 
+# check_output <name> <pattern> [args...]
+# Requires exit status 0 and a line matching pattern.
+check_output() {
+    local name="$1"
+    local pattern="$2"
+    shift 2
+    local output=""
+
+    TESTS_RUN=$((TESTS_RUN + 1))
+    printf 'Test %d: %s... ' "$TESTS_RUN" "$name"
+    if ! output="$("$BASH" "$MAIN" "$@" 2>&1 </dev/null)"; then
+        printf 'FAIL (non-zero exit)\n'
+        printf '%s\n' "$output" | tail -5 | sed 's/^/    /'
+        return 0
+    fi
+    if ! printf '%s\n' "$output" | grep -q -- "$pattern"; then
+        printf 'FAIL (no match for %s)\n' "$pattern"
+        printf '%s\n' "$output" | tail -5 | sed 's/^/    /'
+        return 0
+    fi
+    printf 'PASS\n'
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+}
+
+unset CLAUDE_CODE_OAUTH_TOKEN
+check_output "token status without a token" 'Shared token: not set' token status
+printf 'sk-ant-oat01-cli\n' > "$HOME/.claudebox/oauth-token"
+check_output "token status with a saved token" 'Shared token: saved in' token status
+check_output "slots show a shared-token slot as authenticated" 'Authenticated' slots
+run_case "token remove"        yes token remove
+check_output "token status after remove" 'Shared token: not set' token status
+
 printf '\n%d/%d passed\n' "$TESTS_PASSED" "$TESTS_RUN"
 if [ "$TESTS_PASSED" -ne "$TESTS_RUN" ]; then
     exit 1

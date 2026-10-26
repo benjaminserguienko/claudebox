@@ -108,6 +108,11 @@ Please cd to a project directory first."
         tmux)
             return 0
             ;;
+
+        # Token setup needs no logged-in slot; token set checks the image itself
+        token)
+            return 0
+            ;;
             
         # Default: Unknown commands are forwarded to Claude, so need a slot
         *)
