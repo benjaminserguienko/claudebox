@@ -43,6 +43,16 @@ cd tests
 ./test_in_bash32_docker.sh
 ```
 
+### test_shared_token.sh
+Covers the shared OAuth token (one `claude setup-token` login used by every
+slot): saving and reading the token. Uses a temporary HOME; no Docker needed.
+
+**Usage:**
+```bash
+cd tests
+./test_shared_token.sh
+```
+
 ## Test Coverage
 
 The test suite covers:
