@@ -16,6 +16,10 @@ _cmd_token() {
         remove)
             rm -f "$(shared_token_file)"
             ;;
+        *)
+            printf '%s\n' "Usage: claudebox token [set|status|remove]" >&2
+            return 1
+            ;;
     esac
 }
 

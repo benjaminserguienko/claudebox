@@ -196,5 +196,13 @@ set_without_image_explains_and_runs_nothing() {
 
 check "token set without a built image explains and starts no container" set_without_image_explains_and_runs_nothing
 
+unknown_subcommand_shows_usage() {
+    local output status=0
+    output=$(_cmd_token bogus 2>&1) || status=$?
+    [ "$status" -ne 0 ] && printf '%s' "$output" | grep -q 'Usage: claudebox token'
+}
+
+check "unknown token subcommand shows usage and fails" unknown_subcommand_shows_usage
+
 printf '\n%d/%d tests passed\n' "$TESTS_PASSED" "$TESTS_RUN"
 [ "$TESTS_PASSED" -eq "$TESTS_RUN" ]
