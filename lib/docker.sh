@@ -267,6 +267,12 @@ run_claudebox_container() (
     
     docker_args+=(-v "$PROJECT_SLOT_DIR/.claude":/home/$DOCKER_USER/.claude)
     
+    # With a shared token there is no login to do, so skip Claude's first-run
+    # setup in a fresh slot. Without one, Claude runs its own login flow.
+    if [[ ! -f "$PROJECT_SLOT_DIR/.claude.json" ]] && shared_token_configured; then
+        printf '%s\n' '{"hasCompletedOnboarding":true}' > "$PROJECT_SLOT_DIR/.claude.json"
+    fi
+
     # Mount .claude.json only if it already exists (from previous session)
     if [[ -f "$PROJECT_SLOT_DIR/.claude.json" ]]; then
         docker_args+=(-v "$PROJECT_SLOT_DIR/.claude.json":/home/$DOCKER_USER/.claude.json)

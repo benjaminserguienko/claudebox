@@ -161,6 +161,20 @@ check 'docker receives the saved token value' grep -Fxq 'sk-ant-oat01-saved-secr
 check 'saved token value is not on the docker command line' no_arg_contains 'sk-ant-oat01-saved-secret'
 rm -f "$CLAUDEBOX_HOME/oauth-token"
 
+# A token login has no first-run setup, so a fresh slot is marked as set up.
+# Without a token the slot is left alone so Claude can run its own login flow.
+rm -f "$PROJECT_SLOT_DIR/.claude.json"
+"$BASH" "$SANDBOX/run.sh"
+check 'no shared token leaves a fresh slot without .claude.json' test ! -f "$PROJECT_SLOT_DIR/.claude.json"
+printf 'sk-ant-oat01-saved-secret\n' > "$CLAUDEBOX_HOME/oauth-token"
+"$BASH" "$SANDBOX/run.sh"
+check 'shared token marks a fresh slot as set up' jq -e '.hasCompletedOnboarding == true' "$PROJECT_SLOT_DIR/.claude.json"
+check 'the slot setup file is mounted' grep -Fxq "$PROJECT_SLOT_DIR/.claude.json:/home/claude/.claude.json" "$SANDBOX/args"
+printf '{"hasCompletedOnboarding":true,"numStartups":7}\n' > "$PROJECT_SLOT_DIR/.claude.json"
+"$BASH" "$SANDBOX/run.sh"
+check 'existing slot setup file is kept' jq -e '.numStartups == 7' "$PROJECT_SLOT_DIR/.claude.json"
+rm -f "$CLAUDEBOX_HOME/oauth-token" "$PROJECT_SLOT_DIR/.claude.json"
+
 source "$ROOT_DIR/lib/config.sh"
 check 'DevOps profile retains AWS CLI' bash -c 'case " $(get_profile_packages devops) " in *" awscli "*) exit 0;; *) exit 1;; esac'
 printf '\n%d passed; %d failed\n' "$PASSED" "$FAILED"
