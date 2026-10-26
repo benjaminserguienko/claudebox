@@ -64,6 +64,7 @@ _token_set() {
         return 1
     fi
     save_shared_token "$token"
+    printf '%s\n' "Shared token saved. Every slot in every project will use it."
 }
 
 export -f _cmd_token _token_set _token_status

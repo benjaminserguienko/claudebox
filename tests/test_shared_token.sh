@@ -154,13 +154,15 @@ run_claudebox_container() {
 }
 
 set_saves_pasted_token_from_setup_token() {
-    local slot
+    local slot output
     reset_token_state
     mkdir -p "$PROJECT_PARENT_DIR"
     rm -f "$SANDBOX/run-args" "$SANDBOX/run-slot"
-    printf '  sk-ant-oat01-pasted  \n' | _cmd_token set >/dev/null 2>&1 || return 1
+    output=$(printf '  sk-ant-oat01-pasted  \n' | _cmd_token set 2>&1) || return 1
     slot=$(head -n 1 "$SANDBOX/run-slot")
-    grep -q 'setup-token' "$SANDBOX/run-args" &&
+    printf '%s' "$output" | grep -q 'Shared token saved' &&
+        ! printf '%s' "$output" | grep -q 'pasted' &&
+        grep -q 'setup-token' "$SANDBOX/run-args" &&
         grep -q '^exists$' "$SANDBOX/run-slot" &&
         case "$slot" in "$PROJECT_PARENT_DIR"/.*) true ;; *) false ;; esac &&
         [ ! -d "$slot" ] &&
