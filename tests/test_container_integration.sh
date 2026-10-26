@@ -154,6 +154,8 @@ run_entrypoint() {
         # shellcheck disable=SC1090,SC1091
         source "$ROOT_DIR/lib/project.sh"
         # shellcheck disable=SC1090,SC1091
+        source "$ROOT_DIR/lib/token.sh"
+        # shellcheck disable=SC1090,SC1091
         source "$ROOT_DIR/lib/docker.sh"
         run_claudebox_container "" "interactive" --version
     ) > "$output_file" 2>&1; then

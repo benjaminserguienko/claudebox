@@ -4,6 +4,8 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 if [[ ${1:-} == --child ]]; then
+    # shellcheck source=lib/token.sh
+    source "$ROOT_DIR/lib/token.sh"
     # shellcheck source=lib/docker.sh
     source "$ROOT_DIR/lib/docker.sh"
     PROJECT_DIR="$TEST_ROOT/project with spaces"

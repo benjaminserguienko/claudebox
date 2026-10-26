@@ -113,6 +113,7 @@ for expected_status in 0 23; do
         "$BASH" -c '
         set -euo pipefail
         source "$ROOT_DIR/lib/clipboard.sh"
+        source "$ROOT_DIR/lib/token.sh"
         source "$ROOT_DIR/lib/docker.sh"
         export CLAUDEBOX_SCRIPT_DIR="$ROOT_DIR" CLAUDEBOX_HOME="$TEST_ROOT/home/.claudebox"
         export PROJECT_DIR="$TEST_ROOT/project" PROJECT_PARENT_DIR="$TEST_ROOT/state" PROJECT_SLOT_DIR="$TEST_ROOT/state/slot"

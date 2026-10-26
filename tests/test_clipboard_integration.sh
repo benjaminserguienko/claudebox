@@ -284,6 +284,8 @@ run_clipboard_smoke() {
         # shellcheck disable=SC1090,SC1091
         source "$ROOT_DIR/lib/clipboard.sh"
         # shellcheck disable=SC1090,SC1091
+        source "$ROOT_DIR/lib/token.sh"
+        # shellcheck disable=SC1090,SC1091
         source "$ROOT_DIR/lib/docker.sh"
         run_claudebox_container "" "interactive" clipboard-smoke
     ) > "$output_file" 2>&1; then

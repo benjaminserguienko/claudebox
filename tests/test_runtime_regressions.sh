@@ -21,6 +21,7 @@ printf '%s\n' '{"mcpServers":{"project":{"command":"local"}}}' > "$PROJECT_DIR/.
 cat > "$SANDBOX/run.sh" <<'CHILD'
 #!/usr/bin/env bash
 set -euo pipefail
+source "$ROOT_DIR/lib/token.sh"
 source "$ROOT_DIR/lib/docker.sh"
 get_slot_index() { printf '1\n'; }
 # Capture the arguments and read MCP bind sources while the real launcher runs.
@@ -35,6 +36,7 @@ docker() {
         run) touch "$SANDBOX/container" ;;
     esac
     printf '%s\n' "$@" > "$SANDBOX/args"
+    printf '%s\n' "${CLAUDE_CODE_OAUTH_TOKEN-unset}" > "$SANDBOX/token-env"
     local arg path
     for arg in "$@"; do
         case "$arg" in
@@ -145,6 +147,19 @@ ANTHROPIC_API_KEY=host-test-key "$BASH" "$SANDBOX/run.sh"
 check 'explicit host API key is forwarded' grep -Fxq 'ANTHROPIC_API_KEY=host-test-key' "$SANDBOX/args"
 ANTHROPIC_API_KEY='' "$BASH" "$SANDBOX/run.sh"
 check 'explicitly empty host API key still overrides the env file' grep -Fxq 'ANTHROPIC_API_KEY=' "$SANDBOX/args"
+
+# A shared OAuth token reaches the container by name only, so its value never
+# appears in the docker command line (visible to other users through ps).
+no_arg_contains() { ! grep -Fq -- "$1" "$SANDBOX/args"; }
+"$BASH" "$SANDBOX/run.sh"
+check 'no shared token means none is passed' absent_arg 'CLAUDE_CODE_OAUTH_TOKEN'
+mkdir -p "$CLAUDEBOX_HOME"
+printf 'sk-ant-oat01-saved-secret\n' > "$CLAUDEBOX_HOME/oauth-token"
+"$BASH" "$SANDBOX/run.sh"
+check 'saved shared token is passed by name' grep -Fxq 'CLAUDE_CODE_OAUTH_TOKEN' "$SANDBOX/args"
+check 'docker receives the saved token value' grep -Fxq 'sk-ant-oat01-saved-secret' "$SANDBOX/token-env"
+check 'saved token value is not on the docker command line' no_arg_contains 'sk-ant-oat01-saved-secret'
+rm -f "$CLAUDEBOX_HOME/oauth-token"
 
 source "$ROOT_DIR/lib/config.sh"
 check 'DevOps profile retains AWS CLI' bash -c 'case " $(get_profile_packages devops) " in *" awscli "*) exit 0;; *) exit 1;; esac'

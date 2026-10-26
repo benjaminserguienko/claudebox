@@ -434,6 +434,17 @@ run_claudebox_container() (
     if [[ -n "${ANTHROPIC_API_KEY+x}" ]]; then
         docker_args+=(-e "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY")
     fi
+
+    # Shared login: pass the token by name only, so its value stays out of
+    # the host process list (ps). Like any container variable, it is still
+    # visible to `docker inspect`. This function runs in a subshell, so the
+    # export does not leak.
+    local shared_token
+    shared_token=$(read_shared_token)
+    if [[ -n "$shared_token" ]]; then
+        export CLAUDE_CODE_OAUTH_TOKEN="$shared_token"
+        docker_args+=(-e CLAUDE_CODE_OAUTH_TOKEN)
+    fi
     docker_args+=(
         -e "NODE_ENV=${NODE_ENV:-production}"
         -e "CLAUDEBOX_PROJECT_NAME=$project_name"
