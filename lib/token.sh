@@ -15,7 +15,13 @@ save_shared_token() {
     local file
     file=$(shared_token_file)
     mkdir -p "$(dirname "$file")"
-    printf '%s\n' "$token" > "$file"
+    # The subshell umask keeps the file private from the moment it exists;
+    # chmod also tightens a file left over with looser permissions.
+    (
+        umask 077
+        printf '%s\n' "$token" > "$file"
+    )
+    chmod 600 "$file"
 }
 
 # Print the token to use

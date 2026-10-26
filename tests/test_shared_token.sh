@@ -46,5 +46,14 @@ saved_token_is_read_back() {
 
 check "saved token is read back" saved_token_is_read_back
 
+# find -perm with an exact mode is POSIX; stat output differs on macOS.
+saved_token_is_owner_only() {
+    reset_token_state
+    save_shared_token "sk-ant-oat01-private" || return 1
+    [ -n "$(find "$CLAUDEBOX_HOME/oauth-token" -perm 600)" ]
+}
+
+check "saved token file is readable only by its owner" saved_token_is_owner_only
+
 printf '\n%d/%d tests passed\n' "$TESTS_PASSED" "$TESTS_RUN"
 [ "$TESTS_PASSED" -eq "$TESTS_RUN" ]
