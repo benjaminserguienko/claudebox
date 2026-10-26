@@ -81,5 +81,23 @@ slot_login_decides_without_shared_token() {
 
 check "without a shared token only slots with their own login are authenticated" slot_login_decides_without_shared_token
 
+saved_token_authenticates_every_slot() {
+    local empty
+    reset_token_state
+    empty=$(make_slot empty)
+    save_shared_token "sk-ant-oat01-saved" || return 1
+    slot_is_authenticated "$empty"
+}
+
+host_variable_authenticates_every_slot() {
+    local empty
+    reset_token_state
+    empty=$(make_slot empty)
+    CLAUDE_CODE_OAUTH_TOKEN="sk-ant-oat01-host" slot_is_authenticated "$empty"
+}
+
+check "a saved shared token authenticates a slot without its own login" saved_token_authenticates_every_slot
+check "a host token authenticates a slot without its own login" host_variable_authenticates_every_slot
+
 printf '\n%d/%d tests passed\n' "$TESTS_PASSED" "$TESTS_RUN"
 [ "$TESTS_PASSED" -eq "$TESTS_RUN" ]

@@ -37,10 +37,18 @@ read_shared_token() {
     fi
 }
 
+# Succeeds when a shared token is available
+shared_token_configured() {
+    [[ -n "$(read_shared_token)" ]]
+}
+
 # Succeeds when Claude in this slot can start without logging in
 slot_is_authenticated() {
     local slot_dir="$1"
-    [[ -f "$slot_dir/.claude/.credentials.json" ]]
+    if [[ -f "$slot_dir/.claude/.credentials.json" ]]; then
+        return 0
+    fi
+    shared_token_configured
 }
 
-export -f shared_token_file save_shared_token read_shared_token slot_is_authenticated
+export -f shared_token_file save_shared_token read_shared_token shared_token_configured slot_is_authenticated

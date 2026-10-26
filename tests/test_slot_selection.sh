@@ -255,6 +255,25 @@ check "active slot with existing clipboard bridge attaches" active_slot_clipboar
 check "active slot rejects stale clipboard bridge" active_slot_clipboard_with_dead_bridge_fails
 check "main clipboard slot rejects active session without bridge" main_clipboard_slot_without_bridge_fails
 
+# The fixture slot has no .credentials.json, so only a shared token can log it in.
+forwarded_command_needs_a_login() {
+    export DOCKER_PS_NAMES=""
+    rm -f "$HOME/.claudebox/oauth-token"
+    ! preflight_check doctor >/dev/null 2>&1
+}
+
+forwarded_command_accepts_shared_token() {
+    export DOCKER_PS_NAMES=""
+    save_shared_token "sk-ant-oat01-test"
+    preflight_check doctor >/dev/null 2>&1
+    local status=$?
+    rm -f "$HOME/.claudebox/oauth-token"
+    [ "$status" -eq 0 ]
+}
+
+check "forwarded command is blocked when no slot is logged in" forwarded_command_needs_a_login
+check "forwarded command runs when only a shared token is saved" forwarded_command_accepts_shared_token
+
 printf '\n%d/%d passed\n' "$TESTS_PASSED" "$TESTS_RUN"
 if [ "$TESTS_PASSED" -ne "$TESTS_RUN" ]; then
     exit 1
