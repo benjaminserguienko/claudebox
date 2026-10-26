@@ -63,5 +63,23 @@ host_variable_wins_over_saved_token() {
 
 check "host CLAUDE_CODE_OAUTH_TOKEN wins over the saved token" host_variable_wins_over_saved_token
 
+make_slot() {
+    local dir="$SANDBOX/slots/$1"
+    rm -rf "$dir"
+    mkdir -p "$dir/.claude"
+    printf '%s\n' "$dir"
+}
+
+slot_login_decides_without_shared_token() {
+    local logged_in empty
+    reset_token_state
+    logged_in=$(make_slot logged-in)
+    empty=$(make_slot empty)
+    printf '{}\n' > "$logged_in/.claude/.credentials.json"
+    slot_is_authenticated "$logged_in" && ! slot_is_authenticated "$empty"
+}
+
+check "without a shared token only slots with their own login are authenticated" slot_login_decides_without_shared_token
+
 printf '\n%d/%d tests passed\n' "$TESTS_PASSED" "$TESTS_RUN"
 [ "$TESTS_PASSED" -eq "$TESTS_RUN" ]

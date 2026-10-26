@@ -37,4 +37,10 @@ read_shared_token() {
     fi
 }
 
-export -f shared_token_file save_shared_token read_shared_token
+# Succeeds when Claude in this slot can start without logging in
+slot_is_authenticated() {
+    local slot_dir="$1"
+    [[ -f "$slot_dir/.claude/.credentials.json" ]]
+}
+
+export -f shared_token_file save_shared_token read_shared_token slot_is_authenticated
