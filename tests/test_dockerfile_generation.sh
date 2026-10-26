@@ -49,13 +49,13 @@ grep -q 'sdkman' "$TEST_ROOT/generated.Dockerfile"
 grep -q 'LABEL claudebox.project="test-project"' "$TEST_ROOT/generated.Dockerfile"
 # rustup installs into the current user's HOME, so it must run as the
 # runtime user whose ~/.cargo/bin is on PATH, not as root.
-rustup_user=$(awk '/^USER /{u=$2} /sh\.rustup\.rs/{print u; exit}' "$TEST_ROOT/generated.Dockerfile")
+rustup_user=$(awk '/^[[:space:]]*USER /{u=$2} /^[[:space:]]*RUN .*sh\.rustup\.rs/{print u; exit}' "$TEST_ROOT/generated.Dockerfile")
 if [[ "$rustup_user" != "claude" ]]; then
     printf 'FAIL: rustup runs as %s, expected claude\n' "${rustup_user:-<none>}" >&2
     exit 1
 fi
-grep -q 'ENV PATH="/home/claude/.cargo/bin:' "$TEST_ROOT/generated.Dockerfile"
-if ! grep 'sh\.rustup\.rs' "$TEST_ROOT/generated.Dockerfile" | grep -q -- '--component rust-analyzer'; then
+grep -q '^[[:space:]]*ENV PATH="/home/claude/.cargo/bin:' "$TEST_ROOT/generated.Dockerfile"
+if ! grep '^[[:space:]]*RUN .*sh\.rustup\.rs' "$TEST_ROOT/generated.Dockerfile" | grep -q -- '--component rust-analyzer'; then
     printf 'FAIL: rust profile does not install the rust-analyzer component\n' >&2
     exit 1
 fi
