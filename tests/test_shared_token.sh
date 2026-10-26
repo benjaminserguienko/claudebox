@@ -130,5 +130,16 @@ status_names_host_variable_without_revealing_token() {
 check "token status names the saved file without showing the token" status_names_saved_file_without_revealing_token
 check "token status names the host variable without showing the token" status_names_host_variable_without_revealing_token
 
+remove_forgets_saved_token() {
+    local empty
+    reset_token_state
+    empty=$(make_slot empty)
+    save_shared_token "sk-ant-oat01-saved" || return 1
+    _cmd_token remove >/dev/null 2>&1 || return 1
+    [ ! -e "$CLAUDEBOX_HOME/oauth-token" ] && ! slot_is_authenticated "$empty"
+}
+
+check "token remove forgets the saved token" remove_forgets_saved_token
+
 printf '\n%d/%d tests passed\n' "$TESTS_PASSED" "$TESTS_RUN"
 [ "$TESTS_PASSED" -eq "$TESTS_RUN" ]

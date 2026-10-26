@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Token Commands - Shared login for all slots
 # ============================================================================
-# Commands: token status
+# Commands: token status, token remove
 # One `claude setup-token` login reused by every slot of every project.
 
 _cmd_token() {
@@ -9,6 +9,9 @@ _cmd_token() {
     case "$subcommand" in
         status)
             _token_status
+            ;;
+        remove)
+            rm -f "$(shared_token_file)"
             ;;
     esac
 }
