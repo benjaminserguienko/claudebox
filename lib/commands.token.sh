@@ -13,8 +13,17 @@ _cmd_token() {
     esac
 }
 
+# Say where the token comes from; never print the token itself
 _token_status() {
-    printf '%s\n' "Shared token: not set"
+    local file
+    file=$(shared_token_file)
+    if [[ -n "${CLAUDE_CODE_OAUTH_TOKEN:-}" ]]; then
+        printf '%s\n' "Shared token: set from CLAUDE_CODE_OAUTH_TOKEN"
+    elif [[ -s "$file" ]]; then
+        printf 'Shared token: saved in %s\n' "$file"
+    else
+        printf '%s\n' "Shared token: not set"
+    fi
 }
 
 export -f _cmd_token _token_status

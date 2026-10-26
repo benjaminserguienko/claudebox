@@ -110,5 +110,25 @@ status_without_token_says_not_set() {
 
 check "token status reports when no token is set" status_without_token_says_not_set
 
+status_names_saved_file_without_revealing_token() {
+    local output
+    reset_token_state
+    save_shared_token "sk-ant-oat01-secret-value" || return 1
+    output=$(_cmd_token status 2>&1) || return 1
+    printf '%s' "$output" | grep -q 'oauth-token' &&
+        ! printf '%s' "$output" | grep -q 'secret-value'
+}
+
+status_names_host_variable_without_revealing_token() {
+    local output
+    reset_token_state
+    output=$(CLAUDE_CODE_OAUTH_TOKEN="sk-ant-oat01-secret-value" _cmd_token status 2>&1) || return 1
+    printf '%s' "$output" | grep -q 'CLAUDE_CODE_OAUTH_TOKEN' &&
+        ! printf '%s' "$output" | grep -q 'secret-value'
+}
+
+check "token status names the saved file without showing the token" status_names_saved_file_without_revealing_token
+check "token status names the host variable without showing the token" status_names_host_variable_without_revealing_token
+
 printf '\n%d/%d tests passed\n' "$TESTS_PASSED" "$TESTS_RUN"
 [ "$TESTS_PASSED" -eq "$TESTS_RUN" ]
