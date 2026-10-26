@@ -57,6 +57,8 @@ if [ "${TEST_ADMIN:-false}" = true ]; then
     success() { :; }
     YELLOW=''
     _cmd_shell admin
+elif [ "${TEST_SETUP_TOKEN:-false}" = true ]; then
+    run_claudebox_container "" "pipe" setup-token
 else
     trap 'printf done > "$SANDBOX/caller-cleanup"' EXIT
     run_claudebox_container "claudebox-test-slot" "pipe" --resume 'a session with spaces'
@@ -174,6 +176,14 @@ printf '{"hasCompletedOnboarding":true,"numStartups":7}\n' > "$PROJECT_SLOT_DIR/
 "$BASH" "$SANDBOX/run.sh"
 check 'existing slot setup file is kept' jq -e '.numStartups == 7' "$PROJECT_SLOT_DIR/.claude.json"
 rm -f "$CLAUDEBOX_HOME/oauth-token" "$PROJECT_SLOT_DIR/.claude.json"
+
+# Claude reads a value after --mcp-config as another config, so it would
+# swallow the setup-token subcommand. setup-token runs need no MCP servers.
+"$BASH" "$SANDBOX/run.sh"
+check 'a normal run mounts the user MCP config' grep -Fq ':/tmp/user-mcp-config.json:ro' "$SANDBOX/args"
+TEST_SETUP_TOKEN=true "$BASH" "$SANDBOX/run.sh"
+check 'setup-token run mounts no MCP config' no_arg_contains 'mcp-config.json'
+check 'setup-token reaches the container' grep -Fxq 'setup-token' "$SANDBOX/args"
 
 source "$ROOT_DIR/lib/config.sh"
 check 'DevOps profile retains AWS CLI' bash -c 'case " $(get_profile_packages devops) " in *" awscli "*) exit 0;; *) exit 1;; esac'

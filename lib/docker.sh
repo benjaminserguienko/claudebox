@@ -366,6 +366,13 @@ run_claudebox_container() (
     
     local user_mcp_file=""
     local project_mcp_file=""
+
+    # `claude --mcp-config <file> setup-token` reads setup-token as another
+    # config file, so token setup runs without MCP servers.
+    local mount_mcp=true
+    if [[ "${container_args[0]:-}" == "setup-token" ]]; then
+        mount_mcp=false
+    fi
     
     # Create user MCP config file from ~/.claude.json
     if [[ -f "$HOME/.claude.json" ]]; then
@@ -373,7 +380,7 @@ run_claudebox_container() (
         
         if [[ -n "$user_mcp_file" ]]; then
             local user_count=$(jq '.mcpServers | length' "$user_mcp_file" 2>/dev/null || echo "0")
-            if [[ "$user_count" -gt 0 ]]; then
+            if [[ "$user_count" -gt 0 ]] && [[ "$mount_mcp" == "true" ]]; then
                 if [[ "$VERBOSE" == "true" ]]; then
                     printf "Found %s user MCP servers\n" "$user_count" >&2
                 fi
@@ -412,7 +419,7 @@ run_claudebox_container() (
     
     # Check if we have any project servers
     local project_count=$(jq '.mcpServers | length' "$temp_project_file" 2>/dev/null || echo "0")
-    if [[ "$project_count" -gt 0 ]]; then
+    if [[ "$project_count" -gt 0 ]] && [[ "$mount_mcp" == "true" ]]; then
         project_mcp_file="$temp_project_file"
         if [[ "$VERBOSE" == "true" ]]; then
             printf "Found %s project MCP servers\n" "$project_count" >&2
