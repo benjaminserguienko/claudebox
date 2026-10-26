@@ -37,6 +37,11 @@ _token_status() {
 # list only shows visible folders.
 _token_set() {
     local PROJECT_SLOT_DIR token status=0
+    if ! docker image inspect "$IMAGE_NAME" >/dev/null 2>&1; then
+        printf '%s\n' "ERROR: No Docker image found for this project." \
+            "Run 'claudebox' here first, or run this command in a project you already use." >&2
+        return 1
+    fi
     PROJECT_SLOT_DIR=$(mktemp -d "$PROJECT_PARENT_DIR/.token-setup.XXXXXX")
     mkdir -p "$PROJECT_SLOT_DIR/.claude" "$PROJECT_SLOT_DIR/.config" "$PROJECT_SLOT_DIR/.cache"
     run_claudebox_container "" "interactive" setup-token || status=$?

@@ -181,5 +181,20 @@ set_rejects_empty_paste_and_keeps_old_token() {
 
 check "token set rejects an empty paste and keeps the saved token" set_rejects_empty_paste_and_keeps_old_token
 
+set_without_image_explains_and_runs_nothing() {
+    local output status=0
+    reset_token_state
+    mkdir -p "$PROJECT_PARENT_DIR"
+    rm -f "$SANDBOX/run-args"
+    docker() { return 1; }
+    output=$(printf 'sk-ant-oat01-x\n' | _cmd_token set 2>&1) || status=$?
+    docker() { return 0; }
+    [ "$status" -ne 0 ] &&
+        printf '%s' "$output" | grep -q 'image' &&
+        [ ! -f "$SANDBOX/run-args" ]
+}
+
+check "token set without a built image explains and starts no container" set_without_image_explains_and_runs_nothing
+
 printf '\n%d/%d tests passed\n' "$TESTS_PASSED" "$TESTS_RUN"
 [ "$TESTS_PASSED" -eq "$TESTS_RUN" ]
