@@ -141,5 +141,33 @@ remove_forgets_saved_token() {
 
 check "token remove forgets the saved token" remove_forgets_saved_token
 
+# token set runs Claude in a container; stub the launcher and record what it got.
+export PROJECT_DIR="$SANDBOX/project"
+export PROJECT_PARENT_DIR="$CLAUDEBOX_HOME/projects/test"
+export IMAGE_NAME="claudebox-test"
+docker() { return 0; }
+run_claudebox_container() {
+    printf '%s\n' "$*" > "$SANDBOX/run-args"
+    printf '%s\n' "$PROJECT_SLOT_DIR" > "$SANDBOX/run-slot"
+    [ -d "$PROJECT_SLOT_DIR" ] && printf 'exists\n' >> "$SANDBOX/run-slot"
+    return 0
+}
+
+set_saves_pasted_token_from_setup_token() {
+    local slot
+    reset_token_state
+    mkdir -p "$PROJECT_PARENT_DIR"
+    rm -f "$SANDBOX/run-args" "$SANDBOX/run-slot"
+    printf '  sk-ant-oat01-pasted  \n' | _cmd_token set >/dev/null 2>&1 || return 1
+    slot=$(head -n 1 "$SANDBOX/run-slot")
+    grep -q 'setup-token' "$SANDBOX/run-args" &&
+        grep -q '^exists$' "$SANDBOX/run-slot" &&
+        case "$slot" in "$PROJECT_PARENT_DIR"/.*) true ;; *) false ;; esac &&
+        [ ! -d "$slot" ] &&
+        [ "$(read_shared_token)" = "sk-ant-oat01-pasted" ]
+}
+
+check "token set runs setup-token in a temporary slot and saves the pasted token" set_saves_pasted_token_from_setup_token
+
 printf '\n%d/%d tests passed\n' "$TESTS_PASSED" "$TESTS_RUN"
 [ "$TESTS_PASSED" -eq "$TESTS_RUN" ]
